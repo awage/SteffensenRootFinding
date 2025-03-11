@@ -2,7 +2,7 @@ using DrWatson, Test
 @quickactivate "SteffensenRootFinding"
 
 # Here you include files using `srcdir`
-# include(srcdir("file.jl"))
+include(srcdir("function_stuff.jl"))
 
 # Run test suite
 println("Starting tests")
