@@ -1,8 +1,8 @@
 using LinearAlgebra:norm
 using ProgressMeter
+using Random
 
-# include(srcdir("function_stuff.jl"))
-include(srcdir("function_stuff_gem.jl"))
+include(srcdir("function_stuff.jl"))
 
 
 """ 
@@ -109,12 +109,11 @@ Compute stats!
 function compute_stats(d)
     @unpack ds, seed, Nsamples, ε, max_it, grid = d
     dim = length(grid)
-    # ds = FunIterator(N, dim == 1 ? rand() : rand(dim))
     iterations = 0.0
     exec_time = 0.0
     nc = 0
 
-    sampler = statespace_sampler(grid, seed)
+    samp = sampler(grid, seed)
 
     for k in 1:Nsamples
         set_state!(ds, samp())
@@ -148,14 +147,14 @@ end
 
 
 
-function statespace_sampler(grid::NTuple{N, StepRangeLen{Float64, Base.TwicePrecision{Float64}} where N}, seed::Int)::Function
+function sampler(grid, seed::Int)::Function
 
   rng = MersenneTwister(seed)  
 
   if length(grid) == 1
-      generate_point = () -> rand(rng) * (grid[i].stop - grid[i].start) + grid[i].start 
+      generate_point = () -> rand(rng) * (grid[1][end] - grid[1][1]) + grid[1][1]
   else
-      generate_point = () -> [rand(rng) * (grid[i].stop - grid[i].start) + grid[i].start for i in 1:length(grid)]
+      generate_point = () -> [rand(rng) * (grid[i][end] - grid[i][1]) + grid[i][1] for i in 1:length(grid)]
   end
 
   return generate_point
