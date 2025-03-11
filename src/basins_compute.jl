@@ -55,7 +55,7 @@ are returned into a name dictionnary.
 function compute_basins(d)
     @unpack ds_it, grid, res, ε, max_it = d
     x1, _ =  get_state(ds_it)
-    roots = typeof(x1)[]
+    roots = Vector{eltype(x1)}()
     xg = yg = range(-10, 10; length = res)
     grid = (xg, yg)
 
@@ -78,9 +78,6 @@ function compute_basins(d)
         exec_time[i,j] = n.time
     end
 
-    # Sb, Sbb = basin_entropy(basins) 
-    # _,_,fdim = basins_fractal_dimension(basins)
-    # attractors = roots
     return @strdict(grid, basins, iterations, exec_time, roots)
 end
 
@@ -89,7 +86,7 @@ function custom_mapper(xf, roots, ε)
 
     if isempty(roots) 
         push!(roots, xf) 
-        # @show xf
+        return 1
     end
 
     for (k,r) in enumerate(roots)
@@ -99,7 +96,6 @@ function custom_mapper(xf, roots, ε)
     end
 
     push!(roots, xf) 
-    # @show xf
     return length(roots) 
 end
 
