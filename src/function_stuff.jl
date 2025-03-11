@@ -155,7 +155,6 @@ function get_iterations!(fi::FunIterator, ε::Real, max_it::Int)
             xn, fx = get_state(fi)
             k += 1
             yy[k] = xn
-        @show xn, fx
         end
     catch e
         @warn "Iteration failed at step $k: $e"
