@@ -49,9 +49,10 @@ function print_table_all()
         # MEASURE TIMING FOR CONVERGING IC. We select only ic that converges for all functions. 
         k = 0; cnt = 0;
         tt = zeros(length(g_list))
-        sampler, = statespace_sampler(grid)
+        samp = sampler(grid,123)
+        # sampler, = statespace_sampler(grid)
         while k < 500  && cnt < Int(1e4)
-            x0 = sampler()
+            x0 = samp()
             tm, ex_code = get_timing(ds, x0, ε, max_it) 
             if ex_code
                 tt .= tt .+ tm
