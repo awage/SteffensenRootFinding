@@ -50,18 +50,20 @@ for n in 1:N
 end
 
 # F = F_list[18]
-
+Nsamples = 20000
 alg = :accelerated
 roots =  typeof(rand(N))[] 
 
-for k in 1:40000
+for k in 1:Nsamples
     X0 = 5*randn(N)
 
     # for g in g_list
     g_eps(x) = g_list[1](x,ε/2)
         ds = setup_iterator(F, g_eps, X0; algtype = alg)
         n, xf, q = compute_figure(ds, ε, max_it)
-        custom_mapper(xf, roots, 0.01)
+        if n < max_it
+            custom_mapper(xf, roots, 0.01)
+        end
         # @show n
         # println(" ---------")
     # end
@@ -74,14 +76,16 @@ end
 
 roots2 =  typeof(rand(N))[] 
 
-for k in 1:40000
+for k in 1:Nsamples
     X0 = 5*randn(N)
 
     # for g in g_list
     g_eps(x) = g_list[3](x,ε/2)
         ds = setup_iterator(F, g_eps, X0; algtype = alg)
         n, xf, q = compute_figure(ds, ε, max_it)
-        custom_mapper(xf, roots2, 0.01)
+        if n < 1000
+            custom_mapper(xf, roots2, 0.01)
+        end
         # @show n
         # println(" ---------")
     # end
