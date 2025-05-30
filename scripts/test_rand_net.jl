@@ -25,8 +25,8 @@ function compute_figure(ds, ε, max_it)
     n, yy = get_iterations!(ds, ε, max_it)
     xf, fx = get_state(ds) 
     # @show Float64.(xf), Float64.(fx)
-    @display_float_2_digits xf
-    @display_float_2_digits fx
+    # @display_float_2_digits xf
+    # @display_float_2_digits fx
 
     if 5 ≤ n < max_it
         q = estimate_ACOC!(n, yy)
@@ -39,7 +39,7 @@ end
 ε = 1e-8;  max_it = 1000; 
 setprecision(BigFloat, 100; base = 10)
 
-s = 4.5; gg = 2.5; N = 40
+s = 4.5; gg = 2.5; N = 10
 rng = MersenneTwister(123);
 W = randn(rng,N,N)
 for k in 1:N; W[k,k] = 0.0; end;
@@ -52,18 +52,42 @@ end
 # F = F_list[18]
 
 alg = :accelerated
+roots =  typeof(rand(N))[] 
 
-for k in 1:20
+for k in 1:40000
     X0 = 5*randn(N)
 
-    for g in g_list
-        g_eps(x) = g(x,ε/2)
+    # for g in g_list
+    g_eps(x) = g_list[1](x,ε/2)
         ds = setup_iterator(F, g_eps, X0; algtype = alg)
         n, xf, q = compute_figure(ds, ε, max_it)
-        @show n
-        println(" ---------")
-    end
+        custom_mapper(xf, roots, 0.01)
+        # @show n
+        # println(" ---------")
+    # end
 
-    println(" ---------")
-    println(" ---------")
+    # println(" ---------")
+    # println(" ---------")
 end
+
+@show length(roots)
+
+roots2 =  typeof(rand(N))[] 
+
+for k in 1:40000
+    X0 = 5*randn(N)
+
+    # for g in g_list
+    g_eps(x) = g_list[3](x,ε/2)
+        ds = setup_iterator(F, g_eps, X0; algtype = alg)
+        n, xf, q = compute_figure(ds, ε, max_it)
+        custom_mapper(xf, roots2, 0.01)
+        # @show n
+        # println(" ---------")
+    # end
+
+    # println(" ---------")
+    # println(" ---------")
+end
+
+@show length(roots2)

@@ -184,6 +184,8 @@ function _steffenson_map(f::Function, g::Function)
         gx = g(fx, dfx)
         fx_h = f(x + gx)
         dfx_new = (fx_h - fx)/gx
+        # β = 2*dfx^2/(dfx^2 + dfx_new^2)
+        # x = x - β*fx/dfx_new
         x = x - fx/dfx_new
         S.x = x; S.fx = f(x); S.dfx = dfx_new
         return nothing 
