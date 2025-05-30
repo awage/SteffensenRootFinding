@@ -222,8 +222,6 @@ function _steffenson_map(f::Function, g::Function, d)
 end
 
 
-
-
 # Generate a estimated jacobian function using the same technique for functions
 # from R^k -> R^k._
 function steffenson_map(f::Array{Function}, g::Function, d::Int)
