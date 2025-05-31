@@ -36,62 +36,48 @@ function compute_figure(ds, ε, max_it)
     return n, xf, q
 end
 
-ε = 1e-8;  max_it = 1000; 
-setprecision(BigFloat, 100; base = 10)
+function get_roots_number(N) 
+    ε = 1e-8;  max_it = 1000; 
+    s = 4.5; gg = 2.5; 
+    rng = MersenneTwister(123);
+    W = randn(rng,N,N)
+    for k in 1:N; W[k,k] = 0.0; end;
+    # F(u) = -u .+ s*tanh.(u) .+ gg/sqrt(N)*W*tanh.(u) 
+    F = Vector{Function}(undef,N)
+    for n in 1:N
+        F[n] = u -> (-u[n] .+ s*tanh.(u[n]) .+ gg/sqrt(N)*W[n,:]'*tanh.(u))
+    end
 
-s = 4.5; gg = 2.5; N = 10
-rng = MersenneTwister(123);
-W = randn(rng,N,N)
-for k in 1:N; W[k,k] = 0.0; end;
-# F(u) = -u .+ s*tanh.(u) .+ gg/sqrt(N)*W*tanh.(u) 
-F = Vector{Function}(undef,N)
-for n in 1:N
-    F[n] = u -> (-u[n] .+ s*tanh.(u[n]) .+ gg/sqrt(N)*W[n,:]'*tanh.(u))
-end
-
-# F = F_list[18]
-Nsamples = 20000
-alg = :accelerated
-roots =  typeof(rand(N))[] 
-
-for k in 1:Nsamples
-    X0 = 5*randn(N)
-
-    # for g in g_list
-    g_eps(x) = g_list[1](x,ε/2)
-        ds = setup_iterator(F, g_eps, X0; algtype = alg)
-        n, xf, q = compute_figure(ds, ε, max_it)
-        if n < max_it
-            custom_mapper(xf, roots, 0.01)
+    # F = F_list[18]
+    Nsamples = 10000
+    alg = :accelerated
+    r_num = zeros(Int,3)
+    for (j,g) in enumerate(g_list)
+        roots =  typeof(rand(N))[] 
+        g_eps(x) = g(x,ε/2)
+        for k in 1:Nsamples
+            X0 = 5*randn(N)
+                ds = setup_iterator(F, g_eps, X0; algtype = alg)
+                n, xf, q = compute_figure(ds, ε, max_it)
+                if n < max_it
+                    custom_mapper(xf, roots, 0.01)
+                end
         end
-        # @show n
-        # println(" ---------")
-    # end
-
-    # println(" ---------")
-    # println(" ---------")
+        r_num[j] = length(roots)
+    end
+    @show rnum
+    return r_num
 end
 
-@show length(roots)
-
-roots2 =  typeof(rand(N))[] 
-
-for k in 1:Nsamples
-    X0 = 5*randn(N)
-
-    # for g in g_list
-    g_eps(x) = g_list[3](x,ε/2)
-        ds = setup_iterator(F, g_eps, X0; algtype = alg)
-        n, xf, q = compute_figure(ds, ε, max_it)
-        if n < 1000
-            custom_mapper(xf, roots2, 0.01)
-        end
-        # @show n
-        # println(" ---------")
-    # end
-
-    # println(" ---------")
-    # println(" ---------")
+dims = range(10,100, step = 10)
+rr = zeros(Int,length(dims),3)
+for (h,N) in enumerate(dims)
+    rr[h,:] = get_roots_number(N)
 end
 
-@show length(roots2)
+@show rr
+
+using JLD2
+
+@save "tmp.jld2" dims rr
+
