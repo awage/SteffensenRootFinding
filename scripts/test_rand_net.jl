@@ -65,7 +65,7 @@ function get_roots_number(N)
         end
         r_num[j] = length(roots)
     end
-    @show rnum
+    @show r_num
     return r_num
 end
 
