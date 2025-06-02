@@ -36,7 +36,7 @@ function compute_figure(ds, ε, max_it)
     return n, xf, q
 end
 
-function get_roots_number(N) 
+function get_roots_number(N, Nsamples) 
     ε = 1e-8;  max_it = 1000; 
     s = 4.5; gg = 2.5; 
     rng = MersenneTwister(123);
@@ -49,7 +49,7 @@ function get_roots_number(N)
     end
 
     # F = F_list[18]
-    Nsamples = 50000
+    # Nsamples = 50000
     alg = :accelerated
     r_num = zeros(Int,3)
     for (j,g) in enumerate(g_list)
@@ -69,15 +69,18 @@ function get_roots_number(N)
     return r_num
 end
 
-dims = range(10,20, step = 1)
-rr = zeros(Int,length(dims),3)
-for (h,N) in enumerate(dims)
-    rr[h,:] = get_roots_number(N)
+Nsamples = round.(Int, logrange(1000,200000, length = 10))
+# dims = range(10,20, step = 1)
+rr = zeros(Int,length(Nsamples),3)
+N = 7
+for (h,Ns) in enumerate(Nsamples)
+    rr[h,:] = get_roots_number(N, Ns)
 end
 
 @show rr
 
 using JLD2
 
-@save "tmp.jld2" dims rr
+@save "tmp_Nsamples_N7.jld2" N Nsamples rr
+
 
