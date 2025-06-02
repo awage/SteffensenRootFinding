@@ -69,18 +69,24 @@ function get_roots_number(N, Nsamples)
     return r_num
 end
 
-Nsamples = round.(Int, logrange(1000,200000, length = 10))
-# dims = range(10,20, step = 1)
-rr = zeros(Int,length(Nsamples),3)
-N = 7
-for (h,Ns) in enumerate(Nsamples)
-    rr[h,:] = get_roots_number(N, Ns)
-end
 
-@show rr
+dims = 3:10
+Nsamples = round.(Int, logrange(1000,200000, length = 10))
+roots_N = []
+for N in dims 
+    # dims = range(10,20, step = 1)
+    rr = zeros(Int,length(Nsamples),3)
+
+    for (h,Ns) in enumerate(Nsamples)
+        rr[h,:] = get_roots_number(N, Ns)
+    end
+
+    @show rr
+    push!(roots_N, rr)
+end
 
 using JLD2
 
-@save "tmp_Nsamples_N7.jld2" N Nsamples rr
+@save "tmp_Nsamples_roots.jld2" dims Nsamples roots_N
 
 

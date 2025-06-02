@@ -2,12 +2,15 @@ _sign(x) = (x == 0.0) ? 1 : sign(x)
 
 g_list = [
 # z -> tanh(z),
-# z -> z/(1 + abs(z)), 
+(z,ε) -> tanh(z)/(1 + abs(z)^2), 
+# (z,ε) -> _sign(z)*max(sin(abs(z)), ε), 
 (z,ε) -> _sign(z)*max(tanh(abs(z)), ε), 
-# z -> 5*tanh(z/5),
-# z -> min(abs(z), 1.)*_sign(z),
+# (z,ε) -> tanh(z), 
+# (z,ε) -> 10*tanh(z/10),
+# (z,ε) -> min(abs(z), 1.)*_sign(z),
 # z -> _sign(z)*max(abs(z)/(1 + abs(z)),0.5e-8), 
-(z,ε) -> _sign(z)*max(min(1, abs(z)), ε), 
+(z,ε) -> _sign(z)*max(min(1.0, abs(z)), ε), 
+# (z,ε) -> _sign(z)*ε, 
 (z,ε) -> z]
 
 F_list =[ 

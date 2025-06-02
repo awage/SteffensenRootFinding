@@ -171,6 +171,7 @@ end
 function steffenson_map(f::Function, g::Function, d::Int)
     if d == 1
         return _steffenson_map(f, g)
+        # return Aitken_map(f, g)
     else
         return _steffenson_map(f, g, d)
     end
@@ -193,6 +194,39 @@ function _steffenson_map(f::Function, g::Function)
     return N!
 end
 
+function Aitken_map(f::Function, g::Function)
+    function N!(S::State)
+        x, fx, dfx = S.x, S.fx, S.dfx
+        p0 = x
+        p1 = g(fx, dfx)  + p0
+        p2 = f(p1) + p1
+        # if abs(p2 - 2 * p1 + p0) < tol
+        #     return nothing
+        # end
+        S.x = p0 - (p1 - p0)^2 / (p2 - 2 * p1 + p0)
+        S.fx = f(S.x)
+    end
+end
+
+# """ Steffensen's method using Aitken """ #root finding version modified from above web code
+# function Steffensen_Aitken(f::Function, pinit::Number, tol::AbstractFloat=1e-10, maxiter::Integer=1000)
+#     p0 = pinit
+#     p = Aitken(f, p0)
+#     iter = 0
+#     while abs(p - p0) > tol && iter < maxiter
+#         p0 = p
+#         p = Aitken(f, p0)
+#         iter += 1
+#         if abs(f(p)) < tol
+#             return (p, f(p)), iter
+#         end
+#     end
+#     if abs(p - p0) > tol
+#       return  (NaN, NaN), iter
+#     else
+#       return (p, f(p)), iter
+#     end
+# end
 
 # Generalized Steffensen method for R^d → R
 function _steffenson_map(f::Function, g::Function, d)
