@@ -70,7 +70,7 @@ function get_roots_number(N, Nsamples)
 end
 
 
-dims = 2:10
+dims = 5:10
 N = 12
 Nsamples = round.(Int, logrange(1000,200000, length = 10))
 roots_N = []

@@ -70,8 +70,8 @@ function get_roots_number(N, Nsamples)
 end
 
 
-dims = 3:10
-Nsamples = round.(Int, logrange(1000,200000, length = 10))
+dims = 5:15
+Nsamples = round.(Int, logrange(1000,50000, length = 10))
 roots_N = []
 for N in dims 
     # dims = range(10,20, step = 1)
