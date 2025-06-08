@@ -74,19 +74,15 @@ dims = 5:15
 Nsamples = round.(Int, logrange(1000,50000, length = 10))
 roots_N = []
 for N in dims 
-    # dims = range(10,20, step = 1)
     rr = zeros(Int,length(Nsamples),3)
-
     for (h,Ns) in enumerate(Nsamples)
         rr[h,:] = get_roots_number(N, Ns)
     end
-
     @show rr
     push!(roots_N, rr)
 end
 
 using JLD2
-
 @save "tmp_Nsamples_roots.jld2" dims Nsamples roots_N
 
 

@@ -24,7 +24,7 @@ function print_table_all()
     setprecision(BigFloat, 100; base = 10)
 
     open("table2_dat.txt","w") do io
-    for i in 1:6
+    for i in 1:21
         println(io,L"{\footnotesize $f_{", i, L"}$}" )
 
         for alg in [:normal :accelerated]
