@@ -70,25 +70,37 @@ function get_roots_number(N, Nsamples)
 end
 
 
-dims = 3:8
-Nsamples = round.(Int, logrange(1000,5000, length = 10))
-roots_N = zeros(Int, length(dims), length(g_list), length(Nsamples))
-for (j,N) in enumerate(dims) 
-    rr = zeros(Int,length(Nsamples),3)
-    for (h,Ns) in enumerate(Nsamples)
-        roots_N[j,:,h] = get_roots_number(N, Ns)
-    end
-    @show roots_N[j,:,:]
-    # @show rr
-    # push!(roots_N, rr)
-end
 
+function _roots_number(d) 
+    @unpack dims, Nsamples = d 
+    roots_N = zeros(Int, length(dims), length(g_list), length(Nsamples))
+    for (j,N) in enumerate(dims) 
+        rr = zeros(Int,length(Nsamples),3)
+        for (h,Ns) in enumerate(Nsamples)
+            roots_N[j,:,h] = get_roots_number(N, Ns)
+        end
+        @show roots_N[j,:,:]
+    end
+    return @strdict(dims, Nsamples, roots_N)
+end
  # using JLD2
  # @save "tmp_Nsamples_roots.jld2" dims Nsamples roots_N
 
 a = 0.9313508638295191
 b = -0.12406996404465495
-
 nroots_fit(x) = exp(a*x + b)
 
+dims = 3:8
+Nsamples = round.(Int, logrange(1000,5000, length = 3))
+force = false
+d = @dict(dims, Nsamples) # parametros
+data, file = produce_or_load(
+    datadir(""), # path
+    d, # container for parameter
+    _roots_number, # function
+    prefix = "roots_rand_net", # prefix for savename
+    force = force, # true for forcing sims
+    wsave_kwargs = (;compress = true)
+)
+@unpack roots_N = data
 
