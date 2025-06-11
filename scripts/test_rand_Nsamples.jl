@@ -56,12 +56,12 @@ function get_roots_number(N, Nsamples)
         roots =  typeof(rand(N))[] 
         g_eps(x) = g(x,ε/2)
         for k in 1:Nsamples
-            X0 = 5*randn(N)
-                ds = setup_iterator(F, g_eps, X0; algtype = alg)
-                n, xf, q = compute_figure(ds, ε, max_it)
-                if n < max_it
-                    custom_mapper(xf, roots, 0.01)
-                end
+            X0 = 5*(rand(N) .- 0.5)*2 
+            ds = setup_iterator(F, g_eps, X0; algtype = alg)
+            n, xf, q = compute_figure(ds, ε, max_it)
+            if n < max_it
+                custom_mapper(xf, roots, 0.01)
+            end
         end
         r_num[j] = length(roots)
     end
@@ -83,8 +83,8 @@ for (j,N) in enumerate(dims)
     # push!(roots_N, rr)
 end
 
-# using JLD2
-# @save "tmp_Nsamples_roots.jld2" dims Nsamples roots_N
+ # using JLD2
+ # @save "tmp_Nsamples_roots.jld2" dims Nsamples roots_N
 
 a = 0.9313508638295191
 b = -0.12406996404465495
