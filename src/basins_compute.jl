@@ -91,6 +91,7 @@ function custom_mapper(xf, roots, ε)
 
     for (k,r) in enumerate(roots)
         if norm(r .- xf) < ε
+            # @show norm(r .- xf) 
             return k
         end
     end

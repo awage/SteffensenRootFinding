@@ -70,19 +70,23 @@ function get_roots_number(N, Nsamples)
 end
 
 
-dims = 5:15
-Nsamples = round.(Int, logrange(1000,50000, length = 10))
-roots_N = []
-for N in dims 
+dims = 3:8
+Nsamples = round.(Int, logrange(1000,5000, length = 10))
+roots_N = zeros(Int, length(dims), length(g_list), length(Nsamples))
+for (j,N) in enumerate(dims) 
     rr = zeros(Int,length(Nsamples),3)
     for (h,Ns) in enumerate(Nsamples)
-        rr[h,:] = get_roots_number(N, Ns)
+        roots_N[j,:,h] = get_roots_number(N, Ns)
     end
-    @show rr
-    push!(roots_N, rr)
+    @show roots_N[j,:,:]
+    # @show rr
+    # push!(roots_N, rr)
 end
 
-using JLD2
-@save "tmp_Nsamples_roots.jld2" dims Nsamples roots_N
+# using JLD2
+# @save "tmp_Nsamples_roots.jld2" dims Nsamples roots_N
 
+a = 0.9313508638295191
+b = -0.12406996404465495
 
+nroots_fit(x) = exp(a*x + b)

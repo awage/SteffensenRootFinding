@@ -2,7 +2,7 @@ _sign(x) = (x == 0.0) ? 1 : sign(x)
 
 g_list = [
 # z -> tanh(z),
-(z,ε) -> tanh(z)/(1 + abs(z)^2), 
+# (z,ε) -> tanh(z)/(1 + abs(z)^2), 
 # (z,ε) -> _sign(z)*max(sin(abs(z)), ε), 
 (z,ε) -> _sign(z)*max(tanh(abs(z)), ε), 
 # (z,ε) -> tanh(z), 
