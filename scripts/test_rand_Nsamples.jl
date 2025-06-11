@@ -36,8 +36,8 @@ function compute_figure(ds, ε, max_it)
     return n, xf, q
 end
 
-function get_roots_number(N, Nsamples) 
-    ε = 1e-8;  max_it = 1000; 
+function get_roots_number(N, Nsamples, max_it) 
+    ε = 1e-8;  
     s = 4.5; gg = 2.5; 
     rng = MersenneTwister(123);
     W = randn(rng,N,N)
@@ -72,12 +72,12 @@ end
 
 
 function _roots_number(d) 
-    @unpack dims, Nsamples = d 
+    @unpack dims, Nsamples, max_it = d 
     roots_N = zeros(Int, length(dims), length(g_list), length(Nsamples))
     for (j,N) in enumerate(dims) 
         rr = zeros(Int,length(Nsamples),3)
         for (h,Ns) in enumerate(Nsamples)
-            roots_N[j,:,h] = get_roots_number(N, Ns)
+            roots_N[j,:,h] = get_roots_number(N, Ns, max_it)
         end
         @show roots_N[j,:,:]
     end
@@ -90,10 +90,10 @@ a = 0.9313508638295191
 b = -0.12406996404465495
 nroots_fit(x) = exp(a*x + b)
 
-dims = 3:8
-Nsamples = round.(Int, logrange(1000,5000, length = 3))
+max_it = 200; dims = 3:12
+Nsamples = round.(Int, logrange(1000,100000, length = 5))
 force = false
-d = @dict(dims, Nsamples) # parametros
+d = @dict(dims, Nsamples, max_it) # parametros
 data, file = produce_or_load(
     datadir(""), # path
     d, # container for parameter

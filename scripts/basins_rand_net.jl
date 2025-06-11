@@ -67,12 +67,12 @@ end
 
 
 # Plot all basins 
-res = 200
+res = 500
 ε = 1e-8
-max_it = 1000 
+max_it = 200 
 N = 6
 force = false
-g_ind = 3 
+g_ind = 1 
 
     d = @dict(res, ε, max_it, N, g_ind) # parametros
     data, file = produce_or_load(
