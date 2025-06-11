@@ -104,3 +104,12 @@ data, file = produce_or_load(
 )
 @unpack roots_N = data
 
+f = Figure(); 
+ax = Axis(f[1,1], xlabel = L"N_{dim}", ylabel = L"\Delta N_{roots}") #, yscale = log10);
+
+ind = 3
+plot!(ax, dims, roots_N[:,1,ind] .- roots_N[:,3,ind])
+plot!(ax, dims, roots_N[:,2,ind] .- roots_N[:,3,ind])
+# plot!(ax, dims, nroots.(dims))
+
+f

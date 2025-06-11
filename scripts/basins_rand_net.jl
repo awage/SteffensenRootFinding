@@ -63,7 +63,6 @@ function plot_basins(d)
     end
 
     return @strdict(grid, basins, iterations, roots)
-
 end
 
 
