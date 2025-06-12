@@ -1,0 +1,55 @@
+{\footnotesize $f(x, y) = x^2 + y^2$}
+& {\footnotesize (norm.)}
+ & 0.0 & 0.0 & 80.1 
+ & 17.2 & 17.3 & 27.5 
+ & 0.79 & 0.97 & 1.0 \\
+ \hline
+& {\footnotesize (accel.)}
+ & 0.0 & 0.0 & 0.0 
+ & 16.5 & 16.4 & 18.4 
+ & 1.01 & 1.08 & 1.0 \\
+ \hline
+{\footnotesize $f(x, y) = xy + (x - y) + 100 \sin(y)$}
+& {\footnotesize (norm.)}
+ & 0.0 & 0.0 & 1.5 
+ & 7.2 & 7.2 & 37.3 
+ & 0.82 & 0.83 & 1.0 \\
+ \hline
+& {\footnotesize (accel.)}
+ & 0.0 & 0.0 & 0.0 
+ & 7.1 & 7.2 & 9.0 
+ & 1.01 & 1.09 & 1.0 \\
+ \hline
+{\footnotesize $f(x, y) = x^2 - (1 - e^y)$}
+& {\footnotesize (norm.)}
+ & 0.0 & 0.0 & 64.0 
+ & 10.1 & 10.2 & 11.3 
+ & 1.01 & 1.01 & 1.0 \\
+ \hline
+& {\footnotesize (accel.)}
+ & 0.0 & 0.0 & 31.8 
+ & 7.2 & 7.2 & 9.5 
+ & 1.95 & 0.65 & 1.0 \\
+ \hline
+{\footnotesize $f(x, y, z) = (x + y + z - 3)^2 + (xyz - 1)^2$}
+& {\footnotesize (norm.)}
+ & 55.0 & 50.4 & 99.7 
+ & 86.4 & 87.6 & 107.4 
+ & 0.55 & 0.46 & 1.0 \\
+ \hline
+& {\footnotesize (accel.)}
+ & 49.6 & 52.4 & 45.9 
+ & 122.0 & 125.7 & 162.3 
+ & 0.86 & 0.79 & 1.0 \\
+ \hline
+{\footnotesize $f(x, y, z, t) = \sin(x) + 2 \sin(y) + 3 \sin(z) + 4 \cos(t)$}
+& {\footnotesize (norm.)}
+ & 0.0 & 0.0 & 0.0 
+ & 5.1 & 5.2 & 6.0 
+ & 1.01 & 0.97 & 1.0 \\
+ \hline
+& {\footnotesize (accel.)}
+ & 0.0 & 0.0 & 4.1 
+ & 5.2 & 5.1 & 8.2 
+ & 1.0 & 1.02 & 1.0 \\
+ \hline
