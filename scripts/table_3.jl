@@ -15,7 +15,7 @@ function iterate(ds, x, ε, max_it)
 end
 
 function print_table_all()
-    ε = 1.e-10;  max_it = 200; force = true; Nsamples = Int(5e4)
+    ε = 1.e-8;  max_it = 100; force = true; Nsamples = Int(5e3)
     setprecision(BigFloat, 100; base = 10)
 
     open("table3_dat.txt","w") do io
@@ -33,7 +33,8 @@ function print_table_all()
                 println(io,"& {\\footnotesize (accel.)}" )
             end
 
-            ds = [setup_iterator(F_list[i], x -> g(x,ε), big.(X0[i]); algtype = alg) for g in g_list]
+            # ds = [setup_iterator(F_list[i], x -> g(x,ε), big.(X0[i]); algtype = alg) for g in g_list]
+            ds = [setup_iterator(F_list[i], x -> g(x,ε), X0[i]; algtype = alg) for g in g_list]
 
         for k in eachindex(g_list)
             d = get_stats(ds[k], Nsamples, grid, ε, max_it; seed = 123, prefix = string("stats_", alg, "_f", i, "_g",k ), force = force)
@@ -42,25 +43,27 @@ function print_table_all()
             print(io," & ",  round(Float64((cv[k])*100), digits =1))
         end
 
-        println(io," ")
-        for k in 1:length(g_list)
-            print(io," & ",  round(Float64((it[k])), digits =1))
-        end
-
-        # MEASURE TIMING FOR CONVERGING IC. We select only ic that converges for all functions. 
-        k = 0; cnt = 0;
+        # MEASURE TIMING and iterations FOR CONVERGING IC. We select only ic that converges for all functions. 
+        nmb = 0; cnt = 0;
         tt = zeros(length(g_list))
+        it = zeros(length(g_list))
         samp = sampler(grid,123)
-        while k < 500  && cnt < Int(1e4)
+        while nmb < 500  && cnt < Int(1e4)
             x0 = samp()
-            tm, ex_code = get_timing(ds, x0, ε, max_it) 
+            n, tm, ex_code = get_timing(ds, x0, ε, max_it) 
             if ex_code
                 tt .= tt .+ tm
-                k = k  + 1
+                it .= it .+ n
+                nmb = nmb + 1
             end
             cnt = cnt  + 1
         end
         # @show tt
+
+        println(io," ")
+        for k in 1:length(g_list)
+            print(io," & ",  round(it[k]/nmb, digits = 1))
+        end
 
         println(io," ")
         for k in 1:length(g_list)
@@ -74,14 +77,15 @@ end
 
 function get_timing(ds_v, x0, ε, max_it)
     tt = zeros(length(ds_v))
+    n = zeros(Int, length(ds_v))
     for (k,ds) in enumerate(ds_v) 
-        n, tt[k] = iterate(ds, x0, ε, max_it)
-        if n ≥ max_it
-            return tt, false
+        n[k], tt[k] = iterate(ds, x0, ε, max_it)
+        if n[k] ≥ max_it
+            return n, tt, false
         end
     end
 
-    return tt, true
+    return n, tt, true
 end
 
 print_table_all()

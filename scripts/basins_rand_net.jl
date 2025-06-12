@@ -20,12 +20,20 @@ end
 
 function plot_basins(d)
     @unpack res, ε, N, g_ind, max_it = d
-    xg = yg = range(-4, 4; length = res)
+    xg = yg = range(-5, 5; length = res)
     grid = (xg, yg)
     ε = 1e-8
     max_it = 150
     s = 4.5; gg = 2.5; N = 8
     rng = MersenneTwister(123);
+
+    v = rand(rng, N)
+    P1 = v/norm(v)
+    v = rand(rng, N)
+    P2 = v/norm(v)
+    # P1 = [ 1; zeros(N-1)]
+    # P2 = [ 0; 1; zeros(N-2)]
+
     W = randn(rng,N,N)
     for k in 1:N; W[k,k] = 0.0; end;
     # F(u) = -u .+ s*tanh.(u) .+ gg/sqrt(N)*W*tanh.(u) 
@@ -34,10 +42,6 @@ function plot_basins(d)
         F[n] = u -> (-u[n] .+ s*tanh.(u[n]) .+ gg/sqrt(N)*W[n,:]'*tanh.(u))
     end
 
-    v = rand(N)
-    P1 = v/norm(v)
-    v = rand(N)
-    P2 = v/norm(v)
 
     g(x) = g_list[g_ind](x,ε/2)
     alg = :accelerated
@@ -67,22 +71,31 @@ end
 
 
 # Plot all basins 
-res = 500
+res = 300
 ε = 1e-8
-max_it = 200 
-N = 6
+max_it = 100 
+N = 12
 force = false
-g_ind = 1 
+g_ind = 2
 
-    d = @dict(res, ε, max_it, N, g_ind) # parametros
-    data, file = produce_or_load(
-        datadir(""), # path
-        d, # container for parameter
-        plot_basins, # function
-        prefix = "basins_rand_net", # prefix for savename
-        force = force, # true for forcing sims
-        wsave_kwargs = (;compress = true)
-    )
-@unpack basins, grid = data
+d = @dict(res, ε, max_it, N, g_ind) # parametros
+data, file = produce_or_load(
+    datadir(""), # path
+    d, # container for parameter
+    plot_basins, # function
+    prefix = "basins_rand_net", # prefix for savename
+    force = force, # true for forcing sims
+    wsave_kwargs = (;compress = true)
+)
+@unpack basins, grid, roots = data
 xg, yg = grid
-heatmap(xg, yg, basins)
+s = plotsdir(savename("fig_rand_net",d,"png"))
+f = Figure(size = (800,800))
+ax = Axis(f[1,1], xlabel = L"x_1", ylabel = L"x_2") #, yscale = log10);
+
+using Colors, ColorSchemes
+# cmap = ColorScheme([RGB(1,1,1), RGB(0,1,0), RGB(0.1,0.1,0.1), RGB(1,0.46, 0.46), RGB(0.34,0.34,1)] )
+# cmap = ColorScheme([RGB(1,0,0), RGB(0,0,0), RGB(0.2,0.0,0.0), RGB(1,1,1)])
+cmap = :flag
+heatmap!(ax, xg, yg, basins; colormap = cmap)
+save(s,f)
