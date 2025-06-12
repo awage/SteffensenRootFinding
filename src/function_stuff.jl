@@ -105,6 +105,7 @@ get_state(fi::FunIterator) = fi.state.x, fi.state.fx
 Sets the state variables x, fx, and dfx. If fx or dfx are not provided, they are computed.
 """
 function set_state!(fi::FunIterator, x; fx = nothing, dfx = nothing)
+    x, = promote(x, fi.state.x) 
     fi.state.x = x
 
     if isnothing(fx)

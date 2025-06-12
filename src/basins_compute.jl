@@ -95,7 +95,6 @@ function custom_mapper(xf, roots, ε)
             return k
         end
     end
-
     push!(roots, xf) 
     return length(roots) 
 end
@@ -114,6 +113,7 @@ function compute_stats(d)
 
     for k in 1:Nsamples
         set_state!(ds, samp())
+        # set_state!(ds, big(samp()))
         n = @timed get_iterations!(ds, ε, max_it)
         it = n.value[1]
         if it ≥ max_it

@@ -15,7 +15,8 @@ function iterate(ds, x, ε, max_it)
 end
 
 function print_table_all()
-    ε = 1.e-8;  max_it = 200; force = true; Nsamples = Int(5e4)
+    ε = 1.e-10;  max_it = 200; force = true; Nsamples = Int(5e4)
+    setprecision(BigFloat, 100; base = 10)
 
     open("table3_dat.txt","w") do io
     for i in 1:21
@@ -26,13 +27,13 @@ function print_table_all()
         ex = zeros(length(g_list))
         cv = zeros(length(g_list))
         for alg in [:normal :accelerated]
-                if alg == :normal
-                    println(io,"& {\\footnotesize (norm.)}" )
-                else 
-                    println(io,"& {\\footnotesize (accel.)}" )
-                end
+            if alg == :normal
+                println(io,"& {\\footnotesize (norm.)}" )
+            else 
+                println(io,"& {\\footnotesize (accel.)}" )
+            end
 
-        ds = [setup_iterator(F_list[i], x -> g(x,ε), X0[i]; algtype = alg) for g in g_list]
+            ds = [setup_iterator(F_list[i], x -> g(x,ε), big.(X0[i]); algtype = alg) for g in g_list]
 
         for k in eachindex(g_list)
             d = get_stats(ds[k], Nsamples, grid, ε, max_it; seed = 123, prefix = string("stats_", alg, "_f", i, "_g",k ), force = force)
