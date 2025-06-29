@@ -28,11 +28,11 @@ function print_table_all()
         println(io,L"{\footnotesize $f_{", i, L"}$}" )
 
         for alg in [:normal :accelerated]
-                if alg == :normal
-                    println(io,"& {\\footnotesize (norm.)}" )
-                else 
-                    println(io,"& {\\footnotesize (accel.)}" )
-                end
+                # if alg == :normal
+                #     println(io,"& {\\footnotesize (norm.)}" )
+                # else 
+                #     println(io,"& {\\footnotesize (accel.)}" )
+                # end
             # Iterations
             xf_v = []
             q_v = []
@@ -45,20 +45,20 @@ function print_table_all()
                 println(" ---------")
                 push!(xf_v, xf)
                 push!(q_v, q)
-                print(io," & ", n)
+                # print(io," & ", n)
             end
             
             println(io," ")
             #  Final point 
-             for k in 1:length(g_list)
-                 if length(xf_v[k]) > 1
-                     print(io," & (")
-                     for x in xf_v[k]; print(io, round(Float64(x), digits =2), ", "); end
-                     print(io,")")
-                 else
-                  print(io, " & ", round(Float64(xf_v[k]), digits =2)," ");
-                 end
-             end
+             # for k in 1:length(g_list)
+             #     if length(xf_v[k]) > 1
+             #         print(io," & (")
+             #         for x in xf_v[k]; print(io, round(Float64(x), digits =2), ", "); end
+             #         print(io,")")
+             #     else
+             #      print(io, " & ", round(Float64(xf_v[k]), digits =2)," ");
+             #     end
+             # end
 
             println(io," ")
              # convergence order. 

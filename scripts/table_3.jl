@@ -15,11 +15,11 @@ function iterate(ds, x, ε, max_it)
 end
 
 function print_table_all()
-    ε = 1.e-8;  max_it = 100; force = true; Nsamples = Int(5e3)
+    ε = 1.e-8;  max_it = 100; force = true; Nsamples = Int(5e4)
     setprecision(BigFloat, 100; base = 10)
 
     open("table3_dat.txt","w") do io
-    for i in 1:21
+    for i in [1:15 ; 17:21]
         println(io,L"{\footnotesize $f_{", i, L"}$}" )
 
         grid = ntuple(i -> range(-10, 10, length = 10), length(X0[i]))
@@ -33,7 +33,6 @@ function print_table_all()
                 println(io,"& {\\footnotesize (accel.)}" )
             end
 
-            # ds = [setup_iterator(F_list[i], x -> g(x,ε), big.(X0[i]); algtype = alg) for g in g_list]
             ds = [setup_iterator(F_list[i], x -> g(x,ε), X0[i]; algtype = alg) for g in g_list]
 
         for k in eachindex(g_list)
@@ -68,6 +67,31 @@ function print_table_all()
         println(io," ")
         for k in 1:length(g_list)
             print(io," & ",  round(Float64((tt[k]/tt[length(g_list)])), digits = 2))
+        end
+        
+        setprecision(BigFloat, 100; base = 10)
+        ds = [setup_iterator(F_list[i], x -> g(x,1e-25), big.(X0[i]); algtype = alg) for g in g_list]
+        nmb = 0; cnt = 0;
+        q = zeros(length(g_list))
+        samp = sampler(grid,123)
+        for k in eachindex(ds)
+            while cnt < Int(1e4)
+                x0 = samp()
+                d = length(x0) 
+                set_state!(ds[k], d == 1 ? x0[1] : x0) 
+                n, yy = get_iterations!(ds[k], 1e-25, 1000)
+                if 5 ≤ n < max_it
+                    q[k] = estimate_ACOC!(n, yy)
+                    @show q 
+                    break
+                end
+                cnt = cnt  + 1
+            end
+        end
+
+        println(io," ")
+        for k in 1:length(g_list)
+            print(io," & ",  round(Float64(q[k]), digits = 2))
         end
         println(io," \\\\")
     end

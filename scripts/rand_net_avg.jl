@@ -71,17 +71,17 @@ end
 
 
 function _roots_number(d) 
-    @unpack dims, Nsamples, max_it = d 
-    roots_N = zeros(Int, length(dims), length(g_list), length(Nsamples))
+    @unpack dims, Nsamples, Navg, max_it = d 
+    roots_N = zeros(Int, length(dims), length(g_list), length(Navg))
     rng = MersenneTwister(123);
     for (j,N) in enumerate(dims) 
-        rr = zeros(Int,length(Nsamples),3)
-        for (h,Ns) in enumerate(Nsamples)
-            roots_N[j,:,h] = get_roots_number(N, Ns, max_it, rng)
+        rr = zeros(Int,length(Navg),3)
+        for h in 1:Navg
+            roots_N[j,:,h] = get_roots_number(N, Nsamples, max_it, rng)
         end
         @show roots_N[j,:,:]
     end
-    return @strdict(dims, Nsamples, roots_N)
+    return @strdict(dims, Nsamples, Navg, roots_N)
 end
  # using JLD2
  # @save "tmp_Nsamples_roots.jld2" dims Nsamples roots_N
@@ -91,14 +91,15 @@ b = -0.12406996404465495
 nroots_fit(x) = exp(a*x + b)
 
 max_it = 200; dims = 3:12
-Nsamples = round.(Int, logrange(1000,100000, length = 5))
+Nsamples = 10000
+Navg = 10
 force = false
-d = @dict(dims, Nsamples, max_it) # parametros
+d = @dict(dims, Navg, Nsamples, max_it) # parametros
 data, file = produce_or_load(
     datadir(""), # path
     d, # container for parameter
     _roots_number, # function
-    prefix = "roots_rand_net", # prefix for savename
+    prefix = "roots_rand_net_avg", # prefix for savename
     force = force, # true for forcing sims
     wsave_kwargs = (;compress = true)
 )
@@ -114,4 +115,8 @@ plot!(ax, dims, roots_N[:,2,ind] .- roots_N[:,3,ind], label = L"g_2")
 axislegend(ax; position = :rb) 
 # plot!(ax, dims, nroots.(dims))
 
-f
+f2 = Figure(); 
+ax = Axis(f2[1,1], xlabel = L"N_{dim}", ylabel = L"N_{roots}" , yscale = log10);
+
+plot!(ax, dims, roots_N[:,1,ind])
+
