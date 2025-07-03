@@ -56,7 +56,8 @@ function case_steffenson_map(f::Union{Function,Vector{Function}}, g::Function, d
     if algtype == :normal
         gg = (fx, dfx) -> g(fx) 
     elseif algtype == :accelerated
-        gg = (fx, dfx) -> g(-fx)/g(dfx) 
+        gg = (fx, dfx) -> -g(fx)/g(dfx) 
+        # gg = (fx, dfx) -> -g(fx/dfx) 
     else
         throw(ArgumentError("Invalid algtype: $algtype. Choose :normal or :accelerated.")) 
     end

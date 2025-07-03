@@ -23,12 +23,12 @@ end
 
 # Plot all basins 
 res = 200
-xg = yg = range(-2, 2; length = res)
+xg = yg = range(-10, 10; length = res)
 grid = (xg, yg)
 force = true
 ε = 1e-8
-max_it = 150
-for i in [1,9]
+max_it = 100
+for i in [1, 6, 9, 11]
     for (k,g) in enumerate(g_list)
         F = [ x -> real(F_list[i](x[1]+im*x[2])),  x -> imag(F_list[i](x[1]+im*x[2]))]
         gg(x) = g(x,ε/2)

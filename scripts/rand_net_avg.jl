@@ -92,7 +92,7 @@ nroots_fit(x) = exp(a*x + b)
 
 max_it = 200; dims = 3:12
 Nsamples = 10000
-Navg = 10
+Navg = 20
 force = false
 d = @dict(dims, Navg, Nsamples, max_it) # parametros
 data, file = produce_or_load(
@@ -110,13 +110,30 @@ f = Figure();
 ax = Axis(f[1,1], xlabel = L"N_{dim}", ylabel = L"\Delta N_{roots}") #, yscale = log10);
 
 ind = 3
-plot!(ax, dims, roots_N[:,1,ind] .- roots_N[:,3,ind], label = L"g_1")
-plot!(ax, dims, roots_N[:,2,ind] .- roots_N[:,3,ind], label = L"g_2")
+rr = mean(roots_N, dims = 3)
+rs1 = std(roots_N[:,1,:] .- roots_N[:,3,:], dims = 2)
+rs2 = std(roots_N[:,2,:] .- roots_N[:,3,:], dims = 2)
+errorbars!(ax, dims, rr[:,1] .- rr[:,3], vec(rs1))
+errorbars!(ax, dims, rr[:,2] .- rr[:,3], vec(rs2))
+plot!(ax, dims, rr[:,1] .- rr[:,3], label = L"g_1")
+plot!(ax, dims, rr[:,2] .- rr[:,3], label = L"g_2")
 axislegend(ax; position = :rb) 
 # plot!(ax, dims, nroots.(dims))
 
-f2 = Figure(); 
-ax = Axis(f2[1,1], xlabel = L"N_{dim}", ylabel = L"N_{roots}" , yscale = log10);
+ax_inset = Axis(f[1, 1],
+    width=Relative(0.4),
+    height=Relative(0.4),
+    # backgroundcolor = (:red,1),
+    halign=0.2,
+    valign=0.9,
+    title="Roots number for Steffensen method", 
+    yscale = log10)
 
-plot!(ax, dims, roots_N[:,1,ind])
+# f2 = Figure(); 
+# ax = Axis(f2[1,1], xlabel = L"N_{dim}", ylabel = L"N_{roots}" , yscale = log10);
 
+plot!(ax_inset, dims, rr[:,1])
+translate!(ax_inset.blockscene, 0, 0, 150)
+ax_inset.xticks = [3,5, 7 ,9, 11,13]
+ax_inset.yticks = [10, 100, 1000]
+ax.xticks = dims

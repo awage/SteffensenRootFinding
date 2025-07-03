@@ -11,7 +11,9 @@ g_list = [
 # z -> _sign(z)*max(abs(z)/(1 + abs(z)),0.5e-8), 
 (z,ε) -> _sign(z)*max(min(1.0, abs(z)), ε), 
 # (z,ε) -> _sign(z)*ε, 
-(z,ε) -> z]
+(z,ε) -> _sign(z)*max(abs(z), ε)
+# (z,ε) -> z
+]
 
 F_list =[ 
     x -> x^3 - 9x^2 + 28x - 30, 

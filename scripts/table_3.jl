@@ -19,7 +19,8 @@ function print_table_all()
     setprecision(BigFloat, 100; base = 10)
 
     open("table3_dat.txt","w") do io
-    for i in [1:15 ; 17:21]
+    # for i in [1:15 ; 17:21]
+    for i in 1:21
         println(io,L"{\footnotesize $f_{", i, L"}$}" )
 
         grid = ntuple(i -> range(-10, 10, length = 10), length(X0[i]))
@@ -57,7 +58,7 @@ function print_table_all()
             end
             cnt = cnt  + 1
         end
-        # @show tt
+        tt = tt./it
 
         println(io," ")
         for k in 1:length(g_list)
@@ -79,8 +80,8 @@ function print_table_all()
                 x0 = samp()
                 d = length(x0) 
                 set_state!(ds[k], d == 1 ? x0[1] : x0) 
-                n, yy = get_iterations!(ds[k], 1e-25, 1000)
-                if 5 ≤ n < max_it
+                n, yy = get_iterations!(ds[k], 1e-25, max_it)
+                if 6 ≤ n < max_it
                     q[k] = estimate_ACOC!(n, yy)
                     @show q 
                     break

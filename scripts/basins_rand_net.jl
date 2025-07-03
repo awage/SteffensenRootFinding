@@ -28,9 +28,12 @@ function plot_basins(d)
     rng = MersenneTwister(123);
 
     v = rand(rng, N)
-    P1 = v/norm(v)
-    v = rand(rng, N)
-    P2 = v/norm(v)
+    P1 = (v .> 0.5)
+    # v = rand(rng, N)
+    P2 = 1 .- P1
+    P1 = P1 ./ norm(P1)
+    P2 = P2 ./ norm(P2)
+
     # P1 = [ 1; zeros(N-1)]
     # P2 = [ 0; 1; zeros(N-2)]
 
@@ -75,8 +78,8 @@ res = 300
 ε = 1e-8
 max_it = 100 
 N = 12
-force = false
-g_ind = 2
+force = true
+g_ind = 3
 
 d = @dict(res, ε, max_it, N, g_ind) # parametros
 data, file = produce_or_load(
