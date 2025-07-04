@@ -74,31 +74,32 @@ end
 
 
 # Plot all basins 
-res = 300
+res = 1000
 ε = 1e-8
 max_it = 100 
 N = 12
-force = true
-g_ind = 3
+force = false
 
-d = @dict(res, ε, max_it, N, g_ind) # parametros
-data, file = produce_or_load(
-    datadir(""), # path
-    d, # container for parameter
-    plot_basins, # function
-    prefix = "basins_rand_net", # prefix for savename
-    force = force, # true for forcing sims
-    wsave_kwargs = (;compress = true)
-)
-@unpack basins, grid, roots = data
-xg, yg = grid
-s = plotsdir(savename("fig_rand_net",d,"png"))
-f = Figure(size = (800,800))
-ax = Axis(f[1,1], xlabel = L"x_1", ylabel = L"x_2") #, yscale = log10);
+for g_ind in 1:3
+    d = @dict(res, ε, max_it, N, g_ind) # parametros
+    data, file = produce_or_load(
+        datadir(""), # path
+        d, # container for parameter
+        plot_basins, # function
+        prefix = "basins_rand_net", # prefix for savename
+        force = force, # true for forcing sims
+        wsave_kwargs = (;compress = true)
+    )
+    @unpack basins, grid, roots = data
+    xg, yg = grid
+    s = plotsdir(savename("fig_rand_net",d,"png"))
+    f = Figure(size = (400,400))
+    ax = Axis(f[1,1], xticksvisible = false, yticksvisible = false, xticklabelsvisible = false, yticklabelsvisible = false) #0xlabel = L"x_1", ylabel = L"x_2") #, yscale = log10);
 
-using Colors, ColorSchemes
-# cmap = ColorScheme([RGB(1,1,1), RGB(0,1,0), RGB(0.1,0.1,0.1), RGB(1,0.46, 0.46), RGB(0.34,0.34,1)] )
-# cmap = ColorScheme([RGB(1,0,0), RGB(0,0,0), RGB(0.2,0.0,0.0), RGB(1,1,1)])
-cmap = :flag
-heatmap!(ax, xg, yg, basins; colormap = cmap)
-save(s,f)
+    using Colors, ColorSchemes
+    # cmap = ColorScheme([RGB(1,1,1), RGB(0,1,0), RGB(0.1,0.1,0.1), RGB(1,0.46, 0.46), RGB(0.34,0.34,1)] )
+    # cmap = ColorScheme([RGB(1,0,0), RGB(0,0,0), RGB(0.2,0.0,0.0), RGB(1,1,1)])
+    cmap = :flag
+    heatmap!(ax, xg, yg, basins; colormap = cmap)
+    save(s,f)
+end

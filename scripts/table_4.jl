@@ -47,19 +47,21 @@ function print_table_all()
         end
 
         # MEASURE TIMING FOR CONVERGING IC. We select only ic that converges for all functions. 
-        k = 0; cnt = 0;
+        nmb = 0; cnt = 0;
         tt = zeros(length(g_list))
+        it = zeros(length(g_list))
         samp = sampler(grid,123)
-        # sampler, = statespace_sampler(grid)
-        while k < 500  && cnt < Int(1e4)
+        while nmb < 500  && cnt < Int(1e4)
             x0 = samp()
-            tm, ex_code = get_timing(ds, x0, ε, max_it) 
+            n, tm, ex_code = get_timing(ds, x0, ε, max_it) 
             if ex_code
                 tt .= tt .+ tm
-                k = k  + 1
+                it .= it .+ n
+                nmb = nmb + 1
             end
             cnt = cnt  + 1
         end
+        tt = tt./it
 
         println(io," ")
         for k in 1:length(g_list)
@@ -74,14 +76,15 @@ end
 
 function get_timing(ds_v, x0, ε, max_it)
     tt = zeros(length(ds_v))
+    n = zeros(Int, length(ds_v))
     for (k,ds) in enumerate(ds_v) 
-        n, tt[k] = iterate(ds, x0, ε, max_it)
-        if n ≥ max_it
-            return tt, false
+        n[k], tt[k] = iterate(ds, x0, ε, max_it)
+        if n[k] ≥ max_it
+            return n, tt, false
         end
     end
 
-    return tt, true
+    return n, tt, true
 end
 
 print_table_all()

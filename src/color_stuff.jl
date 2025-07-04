@@ -96,7 +96,7 @@ function plot_heatmap(grid, basins, iterations, attractors; ukeys = unique(basin
         end
     end
 
-    fig = Figure(size = (800,800))
+    fig = Figure(size = (400,400))
     ax = Axis(fig[1,1]; kwargs...)
     heatmap!(ax, grid..., basins_to_plot;
         colormap = cmap,
