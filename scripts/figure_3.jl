@@ -13,6 +13,7 @@ function plot_basins(ds_it, grid, res, ε = 1e-8, max_it =50; force = false, sha
 data = _get_basins(ds_it, grid, res, ε, max_it; force, prefix)
 @unpack basins, iterations, roots, grid = data
 @show bas_num = unique(basins)
+@show count(basins .== -1)/res^2
 if  1 < length(bas_num) < 100
     fig = plot_heatmap(grid, basins, iterations, roots; ukeys = bas_num, shaded, show_attractors, xticksvisible = false, yticksvisible = false, xticklabelsvisible = false, yticklabelsvisible = false)
     s = plotsdir(savename(string(prefix), @dict(res,ε),"png"))
@@ -28,7 +29,7 @@ grid = (xg, yg)
 force = false
 ε = 1e-8
 max_it = 100
-for i in [1, 6, 9, 11]
+for i in [6]
     for (k,g) in enumerate(g_list)
         F = [ x -> real(F_list[i](x[1]+im*x[2])),  x -> imag(F_list[i](x[1]+im*x[2]))]
         gg(x) = g(x,ε/2)

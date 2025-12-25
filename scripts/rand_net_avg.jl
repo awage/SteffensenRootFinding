@@ -107,7 +107,7 @@ data, file = produce_or_load(
 
 using CairoMakie
 f = Figure(); 
-ax = Axis(f[1,1], xlabel = L"N_{dim}", ylabel = L"\Delta N_{roots}") #, yscale = log10);
+ax = Axis(f[1,1];   xlabel = L"N_{dim}", ylabel = L"\Delta N_{roots}", xlabelsize = 25, ylabelsize = 25) #, yscale = log10);
 
 ind = 3
 rr = mean(roots_N, dims = 3)
@@ -137,3 +137,5 @@ translate!(ax_inset.blockscene, 0, 0, 150)
 ax_inset.xticks = [3,5, 7 ,9, 11,13]
 ax_inset.yticks = [10, 100, 1000]
 ax.xticks = dims
+
+save("fig_roots.pdf",f)
