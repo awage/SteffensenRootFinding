@@ -122,8 +122,8 @@ a = 0.9313508638295191
 b = -0.12406996404465495
 nroots_fit(x) = exp(a*x + b)
 
-max_it = 200; dims = 3:8
-Nsamples = 1000
+max_it = 200; dims = 3:12
+Nsamples = 20000
 Navg = 10
 force = true
 d = @dict(dims, Navg, Nsamples, max_it)

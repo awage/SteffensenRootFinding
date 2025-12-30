@@ -90,7 +90,7 @@ a = 0.9313508638295191
 b = -0.12406996404465495
 nroots_fit(x) = exp(a*x + b)
 
-max_it = 200; dims = 3:12
+max_it = 200; dims = 3:5
 Nsamples = round.(Int, logrange(1000,100000, length = 5))
 force = false
 d = @dict(dims, Nsamples, max_it) # parametros

@@ -1,4 +1,4 @@
-_sign(x) = (x == 0.0) ? 1 : sign(x)
+_sign(x) = (x == 0.0) ? 1.0 : sign(x)
 
 g_list = [
 # z -> tanh(z),
@@ -8,11 +8,13 @@ g_list = [
 # (z,ε) -> tanh(z), 
 # (z,ε) -> 10*tanh(z/10),
 # (z,ε) -> min(abs(z), 1.)*_sign(z),
-# z -> _sign(z)*max(abs(z)/(1 + abs(z)),0.5e-8), 
+# (z,ε) -> _sign(z)*max(abs(z)/(1 + abs(z))^4,ε), 
 (z,ε) -> _sign(z)*max(min(1.0, abs(z)), ε), 
 # (z,ε) -> _sign(z)*ε, 
-(z,ε) -> _sign(z)*max(abs(z), ε)
+(z,ε) -> _sign(z)*max(abs(z), ε),
 # (z,ε) -> z
+(z,ε) -> _sign(z)*max(min(z^2, 1e-6), ε) # Amat and Busquier equivalent scheme.
+# (z,ε) -> _sign(z)*max(abs(z^(1/4)), ε)
 ]
 
 F_list =[ 
