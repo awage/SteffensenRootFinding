@@ -84,7 +84,7 @@ function get_roots_number(N, Nsamples, max_it, rng)
         X0 = 5*(rand(N) .- 0.5)*2 
         prob = NonlinearProblem(f_lib!, X0, p_lib)
         # NewtonRaphson is a robust choice comparable to accelerated fixed-point
-        sol = solve(prob, NewtonRaphson(), abstol=ε, reltol=ε, maxiters=max_it)
+        # sol = solve(prob, NewtonRaphson(), abstol=ε, reltol=ε, maxiters=max_it)
         sol = solve(prob, FastShortcutNonlinearPolyalg(), abstol=ε, reltol=ε, maxiters=max_it)
         
         # Check convergence (SciMLBase.successful_retcode(sol) or specific codes)

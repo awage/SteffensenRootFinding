@@ -10,10 +10,10 @@ g_list = [
 # (z,ε) -> min(abs(z), 1.)*_sign(z),
 # (z,ε) -> _sign(z)*max(abs(z)/(1 + abs(z))^4,ε), 
 (z,ε) -> _sign(z)*max(min(1.0, abs(z)), ε), 
+(z,ε) -> _sign(z)*max(min(z^2, 1e-6), ε), # Amat and Busquier equivalent scheme.
 # (z,ε) -> _sign(z)*ε, 
 (z,ε) -> _sign(z)*max(abs(z), ε),
 # (z,ε) -> z
-(z,ε) -> _sign(z)*max(min(z^2, 1e-6), ε) # Amat and Busquier equivalent scheme.
 # (z,ε) -> _sign(z)*max(abs(z^(1/4)), ε)
 ]
 
