@@ -1,20 +1,10 @@
 _sign(x) = (x == 0.0) ? 1.0 : sign(x)
 
 g_list = [
-# z -> tanh(z),
-# (z,ε) -> tanh(z)/(1 + abs(z)^2), 
-# (z,ε) -> _sign(z)*max(sin(abs(z)), ε), 
 (z,ε) -> _sign(z)*max(tanh(abs(z)), ε), 
-# (z,ε) -> tanh(z), 
-# (z,ε) -> 10*tanh(z/10),
-# (z,ε) -> min(abs(z), 1.)*_sign(z),
-# (z,ε) -> _sign(z)*max(abs(z)/(1 + abs(z))^4,ε), 
 (z,ε) -> _sign(z)*max(min(1.0, abs(z)), ε), 
 (z,ε) -> _sign(z)*max(min(z^2, 1e-6), ε), # Amat and Busquier equivalent scheme.
-# (z,ε) -> _sign(z)*ε, 
 (z,ε) -> _sign(z)*max(abs(z), ε),
-# (z,ε) -> z
-# (z,ε) -> _sign(z)*max(abs(z^(1/4)), ε)
 ]
 
 F_list =[ 
@@ -28,7 +18,7 @@ F_list =[
     x -> (x^2 - 1) * (x^2 + 1),
     x -> (x*x - 4)*(x + 1.5)*(x - 0.5),
     x -> (x+2)*(x+1.5)^2*(x-0.5)*(x-2),
-    x -> (x - 1)^3 + 4 * (x-1)^2 - 10,
+    x -> x ≥ 0 ? -(x^3 + x) : (x^4 + x),
     x -> sin(x-14/10)^2 - (x - 14/10)^2 + 1,
     x -> x*x - exp(x) - 3x + 2,
     x -> (x + 5/4) * exp((x + 5/4)*(x + 5/4)) - sin((x + 5/4))^2 + 3 * cos((x + 5/4)) + 5,
@@ -65,6 +55,7 @@ X0 = [1.,
         [7., 7.],
         [0.6, 1.6, 0.6, -0.2],
         [1.5,1.5],
+        1.0
        ]
 
 # X0 = [big.(x) for x in F_X0]

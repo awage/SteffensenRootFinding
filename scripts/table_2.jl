@@ -7,74 +7,119 @@ include(srcdir("function_stuff.jl"))
 include(srcdir("function_list.jl"))
 include(srcdir("basins_compute.jl"))
 
-function compute_figure(ds, ε, max_it)
-@show     xf, fx = get_state(ds) 
-    n, yy = get_iterations!(ds, ε, max_it)
-@show     xf, fx = get_state(ds) 
-    if 5 ≤ n < max_it
-        q = estimate_ACOC!(n, yy)
-    else
-        q = 0
-    end
-    return n, xf, q
+function iterate(ds, x, ε, max_it)
+    d = length(x) 
+    set_state!(ds, d == 1 ? x[1] : x) 
+    n = @timed get_iterations!(ds, ε, max_it)
+    return n.value[1], n.time
 end
 
 function print_table_all()
-    ε = 1e-25;  max_it = 1000; 
+    ε = 1.e-8;  max_it = 100; force = false; Nsamples = Int(5e4)
     setprecision(BigFloat, 100; base = 10)
 
     open("table2_dat.txt","w") do io
-    for i in 1:5
+    # for i in 14 
+    for i in 1:21
         println(io,L"{\footnotesize $f_{", i, L"}$}" )
 
+        grid = ntuple(i -> range(-10, 10, length = 10), length(X0[i]))
+        it = zeros(length(g_list))
+        ex = zeros(length(g_list))
+        cv = zeros(length(g_list))
         for alg in [:normal :accelerated]
-                # if alg == :normal
-                #     println(io,"& {\\footnotesize (norm.)}" )
-                # else 
-                #     println(io,"& {\\footnotesize (accel.)}" )
-                # end
-            # Iterations
-            xf_v = []
-            q_v = []
+            if alg == :normal
+                println(io,"& {\\footnotesize (norm.)}" )
+            else 
+                println(io,"& {\\footnotesize (accel.)}" )
+            end
 
-            for (k,g) in enumerate(g_list)
-                g_eps(x) = g(x,ε/2)
-                ds = setup_iterator(F_list[i], g_eps, big.(X0[i]); algtype = alg)
-                n, xf, q = compute_figure(ds, ε, max_it)
-                @show xf,n
-                println(" ---------")
-                push!(xf_v, xf)
-                push!(q_v, q)
-                # print(io," & ", n)
+            ds = [setup_iterator(F_list[i], x -> g(x,ε/2), X0[i]; algtype = alg) for g in g_list]
+
+            for k in eachindex(g_list)
+                d = get_stats(ds[k], Nsamples, grid, ε, max_it; seed = 123, prefix = string("stats_", alg, "_f", i, "_g",k ), force = force)
+                @unpack nc, iterations, exec_time = d
+                it[k] = iterations; ex[k] = exec_time; cv[k] = nc
+                print(io," & ",  round(Float64((cv[k])*100), digits =1))
+            end
+
+            # MEASURE TIMING and iterations FOR CONVERGING IC. We select only ic that converges for all functions. 
+            nmb = 0; cnt = 0;
+            tt = zeros(length(g_list))
+            it = zeros(length(g_list))
+            samp = sampler(grid,452)
+            while nmb < 500  && cnt < Int(1e4)
+                x0 = samp()
+                n, tm, ex_code = get_timing(ds, x0, ε, max_it) 
+                if ex_code
+                    tt .= tt .+ tm
+                    it .= it .+ n
+                    nmb = nmb + 1
+                end
+                cnt = cnt  + 1
+            end
+            tt = tt./it
+
+            println(io," ")
+            for k in 1:length(g_list)
+                print(io," & ",  round(it[k]/nmb, digits = 1))
+            end
+
+            println(io," ")
+            for k in 1:length(g_list)
+                print(io," & ",  round(Float64((tt[k]/tt[length(g_list)])), digits = 2))
             end
             
-            println(io," ")
-            #  Final point 
-             # for k in 1:length(g_list)
-             #     if length(xf_v[k]) > 1
-             #         print(io," & (")
-             #         for x in xf_v[k]; print(io, round(Float64(x), digits =2), ", "); end
-             #         print(io,")")
-             #     else
-             #      print(io, " & ", round(Float64(xf_v[k]), digits =2)," ");
-             #     end
-             # end
+
+            if i == 16
+                # function 16 causes segfault.
+                ds = [setup_iterator(F_list[i], x -> g(x,1e-8), X0[i]; algtype = alg) for g in g_list]
+                eps_v = 1e-9
+            else
+                setprecision(BigFloat, 100; base = 10)
+                ds = [setup_iterator(F_list[i], x -> g(x,1e-25), big.(X0[i]); algtype = alg) for g in g_list]
+                eps_v = 1e-20
+            end
+            nmb = 0; cnt = 0;
+            q = zeros(length(g_list))
+            samp = sampler(grid,123)
+            for k in eachindex(ds)
+                while cnt < Int(1e6)
+                    x0 = samp()
+                    d = length(x0) 
+                    set_state!(ds[k], d == 1 ? x0[1] : x0) 
+                    n, yy = get_iterations!(ds[k], eps_v, max_it)
+                    if 6 ≤ n < max_it
+                        q[k] = estimate_ACOC!(n, yy)
+                        break
+                    end
+                    cnt = cnt  + 1
+                end
+            end
 
             println(io," ")
-             # convergence order. 
-             for k in 1:length(g_list)
-                 print(io," & ", round(Float64(q_v[k]), digits =1))
-             end
-
+            for k in 1:length(g_list)
+                print(io," & ",  round(Float64(q[k]), digits = 2))
+            end
             println(io," \\\\")
+        end
+    end
+end
+end
 
-        end # algtype
+function get_timing(ds_v, x0, ε, max_it)
+    tt = zeros(length(ds_v))
+    n = zeros(Int, length(ds_v))
+    for (k,ds) in enumerate(ds_v) 
+        n[k], tt[k] = iterate(ds, x0, ε, max_it)
+        if n[k] ≥ max_it
+            return n, tt, false
+        end
     end
 
-    end
+    return n, tt, true
 end
 
 print_table_all()
-
 
 
