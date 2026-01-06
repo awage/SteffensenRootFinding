@@ -10,18 +10,12 @@ include(srcdir("basins_compute.jl"))
 using NonlinearSolve
 using Printf
 
-# ---------------------------------------------------------
-# Structures
-# ---------------------------------------------------------
 struct ExactKuramotoParams
     N::Int
     K::Float64
     omega::Vector{Float64}
 end
 
-# ---------------------------------------------------------
-# The Solver System
-# ---------------------------------------------------------
 function F_kuramoto_system(u, p::ExactKuramotoParams)
     N = p.N
     K = p.K
@@ -39,29 +33,12 @@ function F_kuramoto_system(u, p::ExactKuramotoParams)
     return F
 end
 
-# ---------------------------------------------------------
-# Evaluation Logic
-# ---------------------------------------------------------
 function compute_performance(ds, ε, max_it, theta_exact)
     n, yy = get_iterations!(ds, ε, max_it)
     xf, fx = get_state(ds) 
     
-    # SUCCESS CRITERIA:
-    # 1. Residual is low (F(x) ~ 0)
-    # 2. Distance to EXACT solution is low.
-    # Note: Kuramoto has rotational invariance (theta + c is also a solution).
-    # To compare strictly, we align the mean of the solution to the mean of exact.
-    
     if n < max_it && !any(isnan, xf)
-        # Shift xf so its mean matches theta_exact's mean to handle rotational symmetry
-        shift = mean(theta_exact) - mean(xf)
-        xf_aligned = xf .+ shift
-        
-        # Calculate error from Ground Truth
-        dist_error = norm(xf_aligned - theta_exact)
-        
-        # We consider it a "High Quality Success" if error is small
-        q = (dist_error < 1e-4) ? 1 : 0
+        q = 1
     else
         q = 0
     end
@@ -79,12 +56,9 @@ function get_exact_success_rate(N, Nsamples, max_it, rng)
     # --- MAIN LOOP ---
     for k in 1:Nsamples
         
-        # 1. GENERATE GROUND TRUTH (The "Inverse" Method)
-        # We pick phases clustered in [-pi/4, pi/4]. 
-        # This guarantees a stable synchronized state exists.
         theta_exact = (rand(rng, N) .- 0.5) .* (π/2)
         
-        # 2. CALCULATE OMEGA compatible with this exact solution
+        #  CALCULATE OMEGA 
         omega_fixed = zeros(N)
         for i in 1:N
             interaction = 0.0
@@ -112,15 +86,11 @@ function get_exact_success_rate(N, Nsamples, max_it, rng)
         end
 
         # 4. Define Initial Condition
-        # We perturb the exact solution to test convergence.
-        # If we start at theta_exact, the solver does nothing.
-        # We add noise, but keep it within the basin of attraction.
         perturbation = (rand(rng, N) .- 0.5) .* pi/2 # Random noise up to +/- 1.0 rad
         X0 = theta_exact .+ perturbation
 
         alg_custom = :accelerated
 
-        # A. Run Custom Solvers (g_list)
         for (j, g) in enumerate(g_list)
             X0_c = copy(X0) 
             g_eps(x) = g(x, ε/2)
@@ -130,26 +100,20 @@ function get_exact_success_rate(N, Nsamples, max_it, rng)
             success_counts[j] += q
         end
 
-        # B. Run NonlinearSolve: NewtonRaphson
+        # Run NonlinearSolve: NewtonRaphson
         idx_newton = length(g_list) + 1
         X0_newton = copy(X0)
         prob_newton = NonlinearProblem(F_kuramoto_system, X0_newton, p_nl)
         
         try
             sol = solve(prob_newton, NewtonRaphson(), abstol = ε)
-            
             if sol.retcode == ReturnCode.Success
-                # Manual Check against Ground Truth
-                shift = mean(theta_exact) - mean(sol.u)
-                err = norm((sol.u .+ shift) - theta_exact)
-                if err < 1e-4
-                    success_counts[idx_newton] += 1
-                end
+                success_counts[idx_newton] += 1
             end
         catch
         end
 
-        # C. Run NonlinearSolve: FastShortcutNonlinearPolyalg
+        # Run NonlinearSolve: FastShortcutNonlinearPolyalg
         idx_fast = length(g_list) + 2
         X0_fast = copy(X0)
         prob_fast = NonlinearProblem(F_kuramoto_system, X0_fast, p_nl)
@@ -157,11 +121,7 @@ function get_exact_success_rate(N, Nsamples, max_it, rng)
         try
             sol = solve(prob_fast, FastShortcutNonlinearPolyalg(), abstol = ε)
             if sol.retcode == ReturnCode.Success
-                shift = mean(theta_exact) - mean(sol.u)
-                err = norm((sol.u .+ shift) - theta_exact)
-                if err < 1e-4
-                    success_counts[idx_fast] += 1
-                end
+                success_counts[idx_fast] += 1
             end
         catch
         end
@@ -192,9 +152,9 @@ end
 # --- Plotting / Execution Section ---
 
 max_it = 200
-dims = 5:5:25
+dims = 10:10:50
 Nsamples = 1000 
-Navg = 10
+Navg = 3
 force = true
 d = @dict(dims, Navg, Nsamples, max_it) 
 

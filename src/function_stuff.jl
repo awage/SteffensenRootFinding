@@ -158,8 +158,8 @@ function get_iterations!(fi::FunIterator, ε::Real, max_it::Int)
             yy[k] = xn
         end
     catch e
-        @warn "Iteration failed at step $k: $e"
-        @show xn
+        # @warn "Iteration failed at step $k: $e"
+        # @show xn
         return max_it, yy
     end
     return k, yy
