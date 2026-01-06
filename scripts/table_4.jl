@@ -54,7 +54,7 @@ function get_exact_success_rate(N, Nsamples, max_it, rng)
     success_counts = zeros(Int, num_methods)
 
     # --- MAIN LOOP ---
-    for k in 1:Nsamples
+    Threads.@threads for k in 1:Nsamples
         
         theta_exact = (rand(rng, N) .- 0.5) .* (π/2)
         
