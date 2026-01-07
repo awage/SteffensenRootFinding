@@ -133,20 +133,18 @@ function get_exact_success_rate(N, Nsamples, max_it, rng)
 end
 
 function _success_rates_data(d) 
-    @unpack dims, Nsamples, Navg, max_it = d 
+    @unpack N, Nsamples, Navg, max_it = d 
     
-    success_rates_N = zeros(Float64, length(dims), length(g_list) + 2, Navg)
+    success_rates_N = zeros(Float64,  length(g_list) + 2, Navg)
     rng = MersenneTwister(123);
     
-    for (j,N) in enumerate(dims) 
-        for h in 1:Navg
-            success_rates_N[j,:,h] = get_exact_success_rate(N, Nsamples, max_it, rng)
-        end
-        avg_for_dim = mean(success_rates_N[j,:,:], dims=2)
-        println("Dim $N finished. Avg rates: $avg_for_dim")
+    for h in 1:Navg
+        success_rates_N[:,h] = get_exact_success_rate(N, Nsamples, max_it, rng)
     end
-    
-    return @strdict(dims, Nsamples, Navg, success_rates_N)
+    avg_for_dim = mean(success_rates_N[:,:], dims=2)
+    println("Dim $N finished. Avg rates: $avg_for_dim")
+
+    return @strdict(N, Nsamples, Navg, success_rates_N)
 end
 
 # --- Plotting / Execution Section ---
@@ -154,27 +152,32 @@ end
 max_it = 200
 dims = 10:10:50
 Nsamples = 1000 
-Navg = 3
-force = true
-d = @dict(dims, Navg, Nsamples, max_it) 
+Navg = 10
+force = false
 
-data, file = produce_or_load(
-    datadir(""), 
-    d, 
-    _success_rates_data, 
-    prefix = "success_rates_kuramoto_exact", 
-    force = force, 
-    wsave_kwargs = (;compress = true)
-)
+mean_success = []
+for (j,N) in enumerate(dims) 
+    d = @dict(N, Navg, Nsamples, max_it) 
+    data, file = produce_or_load(
+        datadir(""), 
+        d, 
+        _success_rates_data, 
+        prefix = "success_rates_kuramoto_exact", 
+        force = force, 
+        wsave_kwargs = (;compress = true)
+    )
+    @unpack success_rates_N = data
+    avg_for_dim = mean(success_rates_N[:,:], dims=2)
+    push!(mean_success, avg_for_dim)
+end
 
-@unpack success_rates_N = data
 
-mean_success = mean(success_rates_N, dims=3) 
+# mean_success = mean(success_rates_N, dims=3) 
 println("Mean Success Rates (Exact Kuramoto Recovery):")
 display(mean_success)
 
 let 
-m = mean_success[:,:]; ind = 1
+m = hcat(mean_success...)'; ind = 1
 for r in eachrow(m)
     print(dims[ind]); ind += 1
     for c in r
